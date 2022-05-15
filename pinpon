@@ -1,0 +1,109 @@
+from pygame import *
+from random import randint
+
+font.init()
+font1 = font.SysFont('Arial', 30)
+lose = font1.render('Игра окончена, победил правый игрок!', True, (100, 0, 0))
+win = font1.render('Игра окончена, победил левый игрок!', True, (255,0,0))
+
+img_ball = 'ball.png'
+img_racket = 'racket2.png'
+img_racket2 = 'racket.png'
+img_background = 'background.jpg'
+
+class GameSprite(sprite.Sprite):
+    def __init__(self, player_image, player_x, player_y, size_x, size_y, player_speed):
+        sprite.Sprite.__init__(self)
+        self.image = transform.scale(image.load(player_image), (size_x, size_y))
+        self.speed = player_speed
+        self.rect = self.image.get_rect()
+        self.rect.x = player_x
+        self.rect.y = player_y
+    def reset(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+
+class Player_one(GameSprite):
+    def update(self):
+        keys = key.get_pressed()
+        if keys[K_UP] and self.rect.y >5:
+            self.rect.y -= self.speed
+        if keys[K_DOWN] and self.rect.y < win_height-115:
+            self.rect.y += self.speed
+
+class Player_two(GameSprite):
+    def update(self):
+        keys = key.get_pressed()
+        if keys[K_w] and self.rect.y >5:
+            self.rect.y -= self.speed
+        if keys[K_s] and self.rect.y < win_height-115:
+            self.rect.y += self.speed
+finish = False
+run = True
+win_width = 720
+win_height = 480
+
+speed_x = 13
+speed_y = 14
+
+        
+
+
+display.set_caption('ping-pong')
+window = display.set_mode((win_width, win_height))
+background = transform.scale(image.load(img_background), (win_width, win_height))
+
+one = Player_one(img_racket, 650, 200, 80, 110, 10)
+two = Player_two(img_racket2, -10, 200, 80, 110, 10)
+ball = GameSprite(img_ball, 310, 200, 50, 50, 10)
+ 
+if ball.rect.x < 0:
+    finish = True
+    window.blit(lose1, (200,200))
+    game_over + True
+
+if ball.rect.x > win_width:
+    finish = True
+    window.blit(lose2, (200,200)) 
+    game_over = True
+
+while run:
+    for e in event.get():
+        if e.type == QUIT:
+            run = False
+    if not finish:
+        window.blit(background,(0,0))
+
+        ball.rect.x += speed_x
+        ball.rect.y += speed_y
+
+        one.update()
+        two.update()
+        
+
+        if ball.rect.x <=-20:
+            finish = True
+            window.blit(lose, (200,200))
+        if ball.rect.x >= 720:
+            finish = True
+            window.blit(win, (200,200))
+
+        if ball.rect.right > one.rect.left and ball.rect.left < one.rect.right and ball.rect.bottom > one.rect.top and ball.rect.top < one.rect.bottom:
+            ball.speed *=-1
+
+
+        if ball.rect.right > two.rect.left and ball.rect.left < two.rect.right and ball.rect.bottom > two.rect.top and ball.rect.top < two.rect.bottom:
+            ball.speed *=-1
+
+        if sprite.collide_rect(one,ball) or sprite.collide_rect(two,ball):
+            speed_x *= -1
+            speed_y *= 1
+
+        if ball.rect.y > win_height - 50 or ball.rect.y < 0:
+            speed_y *= -1
+
+        one.reset()
+        two.reset()
+        ball.reset()
+
+        display.update()
+    time.delay(50)
